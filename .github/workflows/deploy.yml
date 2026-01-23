@@ -45,9 +45,9 @@ jobs:
             echo "📦 Fetching latest changes..."
             git fetch origin
             
-            echo "🔄 Checking out branch ${{ inputs.branch }}..."
-            git checkout ${{ inputs.branch }}
-            git pull origin ${{ inputs.branch }}
+            echo "🔄 Checking out branch ${{ github.event.inputs.branch }}..."
+            git checkout ${{ github.event.inputs.branch }}
+            git reset --hard origin/${{ github.event.inputs.branch }}
             
             echo "🛑 Stopping containers..."
             docker compose down || true
