@@ -73,7 +73,7 @@ func NewStrategyRegistry() *executor.StrategyRegistry {
 	return executor.NewStrategyRegistry()
 }
 
-func NewContainerPool(cfg *Config, lc fx.Lifecycle) *executor.ContainerPool {
+func NewContainerPool(cfg *Config, lc fx.Lifecycle) executor.PoolInterface {
 	pool := executor.NewContainerPool(cfg.ContainerPoolSize)
 
 	lc.Append(fx.Hook{

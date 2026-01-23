@@ -21,7 +21,11 @@ func TestIntegrationSubmitAndStatus(t *testing.T) {
 
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	pool := executor.NewMockContainerPool()
+	pool := executor.NewContainerPool(2)
+	if err := pool.Initialize(); err != nil {
+		t.Fatalf("Failed to initialize pool: %v", err)
+	}
+	defer pool.Cleanup()
 	exec := executor.NewDockerExecutor(registry, pool)
 	r := runner.NewRunner(q, exec, 2)
 	r.Start()
@@ -92,7 +96,11 @@ func TestIntegrationSyncSubmit(t *testing.T) {
 
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	pool := executor.NewMockContainerPool()
+	pool := executor.NewContainerPool(2)
+	if err := pool.Initialize(); err != nil {
+		t.Fatalf("Failed to initialize pool: %v", err)
+	}
+	defer pool.Cleanup()
 	exec := executor.NewDockerExecutor(registry, pool)
 	r := runner.NewRunner(q, exec, 2)
 
@@ -164,7 +172,11 @@ func TestIntegrationMultipleLanguages(t *testing.T) {
 
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	pool := executor.NewMockContainerPool()
+	pool := executor.NewContainerPool(2)
+	if err := pool.Initialize(); err != nil {
+		t.Fatalf("Failed to initialize pool: %v", err)
+	}
+	defer pool.Cleanup()
 	exec := executor.NewDockerExecutor(registry, pool)
 	r := runner.NewRunner(q, exec, 2)
 
