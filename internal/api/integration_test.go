@@ -21,7 +21,8 @@ func TestIntegrationSubmitAndStatus(t *testing.T) {
 
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	exec := executor.NewDockerExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := executor.NewDockerExecutor(registry, pool)
 	r := runner.NewRunner(q, exec, 2)
 	r.Start()
 	defer r.Stop()
@@ -91,7 +92,8 @@ func TestIntegrationSyncSubmit(t *testing.T) {
 
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	exec := executor.NewDockerExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := executor.NewDockerExecutor(registry, pool)
 	r := runner.NewRunner(q, exec, 2)
 
 	api := NewAPI(q, r)
@@ -162,7 +164,8 @@ func TestIntegrationMultipleLanguages(t *testing.T) {
 
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	exec := executor.NewDockerExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := executor.NewDockerExecutor(registry, pool)
 	r := runner.NewRunner(q, exec, 2)
 
 	api := NewAPI(q, r)

@@ -75,6 +75,13 @@ issues:
         - dupl
         - gosec
         - goconst
+    - path: scripts/
+      linters:
+        - errcheck
+        - gosec
+        - gocyclo
+        - dupl
+        - noctx
     - linters:
         - staticcheck
       text: "SA1019:"  # Ignore deprecation warnings for now

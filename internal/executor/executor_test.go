@@ -10,13 +10,17 @@ import (
 
 func TestNewDockerExecutor(t *testing.T) {
 	registry := NewStrategyRegistry()
-	executor := NewDockerExecutor(registry)
+	pool := NewMockContainerPool()
+	executor := NewDockerExecutor(registry, pool)
 
 	if executor == nil {
 		t.Fatal("NewDockerExecutor returned nil")
 	}
 	if executor.registry == nil {
 		t.Error("Registry not set")
+	}
+	if executor.pool == nil {
+		t.Error("Pool not set")
 	}
 }
 
@@ -37,7 +41,8 @@ func TestExecutorConstants(t *testing.T) {
 
 func TestExecuteUnsupportedLanguage(t *testing.T) {
 	registry := NewStrategyRegistry()
-	executor := NewDockerExecutor(registry)
+	pool := NewMockContainerPool()
+	executor := NewDockerExecutor(registry, pool)
 
 	submission := &models.Submission{
 		ID:          "test-1",
@@ -64,7 +69,8 @@ func TestExecuteContextCancellation(t *testing.T) {
 	}
 
 	registry := NewStrategyRegistry()
-	executor := NewDockerExecutor(registry)
+	pool := NewMockContainerPool()
+	executor := NewDockerExecutor(registry, pool)
 
 	submission := &models.Submission{
 		ID:          "test-timeout",
@@ -86,7 +92,8 @@ func TestExecuteContextCancellation(t *testing.T) {
 
 func TestExecuteCommandBuilding(t *testing.T) {
 	registry := NewStrategyRegistry()
-	executor := NewDockerExecutor(registry)
+	pool := NewMockContainerPool()
+	executor := NewDockerExecutor(registry, pool)
 
 	tests := []struct {
 		language    string

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"codeworkers/internal/api"
+	"codeworkers/internal/executor"
 	"codeworkers/internal/runner"
 
 	"go.uber.org/fx"
@@ -22,6 +23,7 @@ func TestNewRunnerLifecycle(t *testing.T) {
 			NewConfig,
 			NewQueue,
 			NewStrategyRegistry,
+			NewContainerPool,
 			NewExecutor,
 			NewRunner,
 		),
@@ -56,6 +58,7 @@ func TestNewAPILifecycle(t *testing.T) {
 			NewConfig,
 			NewQueue,
 			NewStrategyRegistry,
+			NewContainerPool,
 			NewExecutor,
 			NewRunner,
 			NewAPI,
@@ -84,7 +87,8 @@ func TestProvidersIntegration(t *testing.T) {
 	cfg := NewConfig()
 	q := NewQueue(cfg)
 	registry := NewStrategyRegistry()
-	exec := NewExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := NewExecutor(registry, pool)
 
 	if cfg == nil {
 		t.Fatal("Config is nil")

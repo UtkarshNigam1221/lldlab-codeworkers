@@ -1,0 +1,82 @@
+name: Manual Deploy to EC2
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'main'
+        type: string
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+      
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            
+            echo "🌿 Deploying branch: ${{ inputs.branch }}"
+            echo "🌍 Environment: ${{ inputs.environment }}"
+            
+            cd ~/lldlab-codeworkers
+            
+            echo "📦 Fetching latest changes..."
+            git fetch origin
+            
+            echo "🔄 Checking out branch ${{ inputs.branch }}..."
+            git checkout ${{ inputs.branch }}
+            git pull origin ${{ inputs.branch }}
+            
+            echo "🛑 Stopping containers..."
+            docker compose down || true
+            
+            echo "🏗️  Building sandbox image..."
+            make build-sandbox
+            
+            echo "🏗️  Building application image..."
+            docker compose build --no-cache
+            
+            echo "🚀 Starting services..."
+            docker compose up -d
+            
+            echo "⏳ Waiting for services to be ready..."
+            sleep 5
+            
+            echo "✅ Deployment complete!"
+            echo "📊 Container status:"
+            docker compose ps
+            
+            echo "🔍 Health check:"
+            curl -f http://localhost:8080/health || echo "⚠️  Health check failed"
+      
+      - name: Deployment summary
+        run: |
+          echo "### Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ inputs.branch }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Host**: ${{ secrets.EC2_HOST }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployed by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

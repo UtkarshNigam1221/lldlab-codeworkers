@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"time"
 )
 
 const (
@@ -14,14 +15,19 @@ const (
 	DockerCPULimit  = "1.0"
 	DockerPidsLimit = "50"
 	DockerNetwork   = "none"
+	AcquireTimeout  = 10 * time.Second
 )
 
 type DockerExecutor struct {
 	registry *StrategyRegistry
+	pool     PoolInterface
 }
 
-func NewDockerExecutor(registry *StrategyRegistry) *DockerExecutor {
-	return &DockerExecutor{registry: registry}
+func NewDockerExecutor(registry *StrategyRegistry, pool PoolInterface) *DockerExecutor {
+	return &DockerExecutor{
+		registry: registry,
+		pool:     pool,
+	}
 }
 
 func (e *DockerExecutor) Execute(ctx context.Context, sub *models.Submission, input string) (string, error) {
@@ -31,15 +37,18 @@ func (e *DockerExecutor) Execute(ctx context.Context, sub *models.Submission, in
 	}
 
 	runCmd := strategy.BuildRunCommand(sub.Code, input)
-	memLimit := fmt.Sprintf("%dm", sub.MemoryLimit)
 
-	cmd := exec.CommandContext(ctx, "docker", "run", "--rm",
-		"--network", DockerNetwork,
-		"--memory", memLimit,
-		"--memory-swap", memLimit,
-		"--cpus", DockerCPULimit,
-		"--pids-limit", DockerPidsLimit,
-		DockerImage,
+	acquireCtx, cancel := context.WithTimeout(ctx, AcquireTimeout)
+	defer cancel()
+
+	container, err := e.pool.Acquire(acquireCtx)
+	if err != nil {
+		return "", fmt.Errorf("failed to acquire container: %w", err)
+	}
+	defer e.pool.Release(container)
+
+	cmd := exec.CommandContext(ctx, "docker", "exec", "-i",
+		container.Name,
 		"sh", "-c", runCmd,
 	)
 

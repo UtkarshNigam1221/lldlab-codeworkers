@@ -12,7 +12,8 @@ import (
 func TestNewRunner(t *testing.T) {
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	exec := executor.NewDockerExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := executor.NewDockerExecutor(registry, pool)
 	workers := 5
 
 	r := NewRunner(q, exec, workers)
@@ -37,7 +38,8 @@ func TestNewRunner(t *testing.T) {
 func TestRunnerStartStop(t *testing.T) {
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	exec := executor.NewDockerExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := executor.NewDockerExecutor(registry, pool)
 	r := NewRunner(q, exec, 2)
 
 	r.Start()
@@ -75,7 +77,8 @@ func TestLogConstants(t *testing.T) {
 func TestExecuteSync(t *testing.T) {
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	exec := executor.NewDockerExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := executor.NewDockerExecutor(registry, pool)
 	r := NewRunner(q, exec, 1)
 
 	sub := &models.Submission{

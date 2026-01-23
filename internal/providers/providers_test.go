@@ -2,6 +2,8 @@ package providers
 
 import (
 	"testing"
+
+	"codeworkers/internal/executor"
 )
 
 func TestNewConfig(t *testing.T) {
@@ -64,9 +66,10 @@ func TestNewStrategyRegistry(t *testing.T) {
 
 func TestNewExecutor(t *testing.T) {
 	registry := NewStrategyRegistry()
-	executor := NewExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := NewExecutor(registry, pool)
 
-	if executor == nil {
+	if exec == nil {
 		t.Fatal("NewExecutor returned nil")
 	}
 }

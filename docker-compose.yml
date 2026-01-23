@@ -12,7 +12,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - WORKERS=5
-      - QUEUE_SIZE=100
+      - QUEUE_SIZE=200
+      - CONTAINER_POOL_SIZE=5
     restart: unless-stopped
     networks:
       - codeworkers-net

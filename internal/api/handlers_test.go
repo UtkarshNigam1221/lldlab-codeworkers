@@ -19,7 +19,8 @@ import (
 func setupTestAPI() *API {
 	q := queue.NewQueue(10)
 	registry := executor.NewStrategyRegistry()
-	exec := executor.NewDockerExecutor(registry)
+	pool := executor.NewMockContainerPool()
+	exec := executor.NewDockerExecutor(registry, pool)
 	r := runner.NewRunner(q, exec, 2)
 	return NewAPI(q, r)
 }

@@ -4,10 +4,10 @@ build-sandbox:
 	docker build -t code-sandbox -f docker/Dockerfile.sandbox .
 
 build:
-	docker-compose build
+	docker compose build
 
 run: build-sandbox
-	docker-compose up
+	docker compose up
 
 dev:
 	go run ./cmd/worker
@@ -66,7 +66,7 @@ test-api:
 	./scripts/test_api.sh
 
 clean:
-	docker-compose down
+	docker compose down
 	docker rmi code-sandbox codeworkers-worker -f
 	rm -f codeworkers coverage.out coverage.html
 

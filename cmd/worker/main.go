@@ -14,6 +14,7 @@ func main() {
 			providers.NewConfig,
 			providers.NewQueue,
 			providers.NewStrategyRegistry,
+			providers.NewContainerPool,
 			providers.NewExecutor,
 			providers.NewRunner,
 			providers.NewAPI,
