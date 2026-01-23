@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: codeworkers
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WORKERS=5
+      - QUEUE_SIZE=100
+    restart: unless-stopped
+    networks:
+      - codeworkers-net
+
+networks:
+  codeworkers-net:
+    driver: bridge

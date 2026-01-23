@@ -1,0 +1,24 @@
+FROM alpine:3.19
+
+RUN apk add --no-cache \
+    gcc \
+    g++ \
+    python3 \
+    py3-pip \
+    openjdk17-jdk \
+    nodejs \
+    npm \
+    go \
+    && rm -rf /var/cache/apk/*
+
+RUN npm install -g typescript ts-node
+
+RUN adduser -D -u 1001 sandbox && \
+    mkdir -p /workspace && \
+    chown -R sandbox:sandbox /workspace
+
+WORKDIR /workspace
+
+USER sandbox
+
+CMD ["sh"]
